@@ -1,0 +1,10 @@
+.build/
+build/
+.swiftpm/
+*.xcodeproj/
+DerivedData/
+.DS_Store
+
+# From the Apple Developer portal, per machine
+Resources/embedded.provisionprofile
+Resources/Clipstack.entitlements
