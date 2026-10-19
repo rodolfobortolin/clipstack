@@ -1,5 +1,6 @@
 #!/bin/sh
-# Notarizes and staples build/Clipstack.app, then packs it in a zip to share.
+# Notarizes and staples build/Clipstack.app, then packs it to share: a zip and a
+# disk image, both in build/.
 #
 # Only needed when someone else installs it: on your own Mac the Developer ID
 # signature from build-app.sh is enough.
@@ -37,3 +38,23 @@ xcrun stapler staple "$APP"
 spctl -a -vvv -t exec "$APP"
 ditto -c -k --keepParent "$APP" "$ZIP"
 echo "==> $ZIP"
+
+# The disk image: the app beside a link to Applications, to drag it across. It is
+# signed with the app's own identity and notarized as well, so Gatekeeper accepts
+# the image itself and not only the app inside. Its name has no version, so
+# releases/latest/download/Clipstack.dmg always gets the newest one.
+IDENTITY=$(codesign -dvv "$APP" 2>&1 | sed -n 's/^Authority=\(Developer ID Application:.*\)$/\1/p')
+[ -n "$IDENTITY" ] || { echo "the app isn't signed with a Developer ID, so there is no disk image"; exit 1; }
+DMG=build/Clipstack.dmg
+STAGE=$(mktemp -d)/Clipstack
+mkdir -p "$STAGE"
+ditto "$APP" "$STAGE/Clipstack.app"
+ln -s /Applications "$STAGE/Applications"
+rm -f "$DMG"
+hdiutil create -volname Clipstack -srcfolder "$STAGE" -fs HFS+ -format UDZO "$DMG" >/dev/null
+codesign --force --timestamp --sign "$IDENTITY" "$DMG"
+echo "==> submitting the disk image to Apple"
+xcrun notarytool submit "$DMG" "$@" --wait
+xcrun stapler staple "$DMG"
+spctl -a -vvv -t open --context context:primary-signature "$DMG"
+echo "==> $DMG"

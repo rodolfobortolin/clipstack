@@ -8,9 +8,10 @@ Built to replace CopyClip, with images, files, colors and snippets with variable
 
 ## Install
 
-Download the latest `Clipstack-x.y.z.zip` from [Releases](../../releases/latest), unzip it
-and move **Clipstack** to Applications. It's signed with a Developer ID and notarized by
-Apple. Requires macOS 14 Sonoma or later.
+Download the latest `Clipstack.dmg` from [Releases](../../releases/latest), open it
+and drag **Clipstack** to Applications (there's a `.zip` too, if you prefer). It's signed
+with a Developer ID and notarized by Apple, and runs on Macs with Apple silicon or Intel
+and macOS 14 Sonoma or later.
 
 To paste for you, Clipstack needs **Accessibility** permission (it sends ⌘V to the app
 you're in); it asks the first time. Without it, the item is copied and you press ⌘V
@@ -59,7 +60,7 @@ Needs Xcode 16 or later (Swift 6.2).
 ```sh
 Scripts/build-app.sh            # build/Clipstack.app
 Scripts/build-app.sh --install  # and install it in /Applications
-Scripts/notarize.sh             # notarize and zip it for sharing
+Scripts/notarize.sh             # notarize it, then a zip and a disk image to share
 ```
 
 The build signs with the first **Developer ID Application** identity in your Keychain (set

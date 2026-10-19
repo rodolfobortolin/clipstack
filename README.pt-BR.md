@@ -6,6 +6,16 @@ cores e snippets com variáveis.
 
 *[English](README.md)*
 
+## Instalar
+
+Baixe o `Clipstack.dmg` mais recente em [Releases](../../releases/latest), abra e
+arraste o **Clipstack** para Aplicativos (tem um `.zip` também, se preferir). É assinado com
+Developer ID e notarizado pela Apple, e roda em Macs com Apple silicon ou Intel e macOS 14
+Sonoma ou mais novo.
+
+Para colar por você, o Clipstack precisa da permissão de **Acessibilidade** (ele manda ⌘V
+para o app em uso); ele pede na primeira vez. Sem ela, o item é copiado e você aperta ⌘V.
+
 ## O que faz
 
 - Guarda texto, texto formatado, links, cores (`#RRGGBB`), imagens e arquivos copiados no Finder.
@@ -49,7 +59,7 @@ Precisa do Xcode 16 ou mais novo (Swift 6.2).
 ```sh
 Scripts/build-app.sh            # build/Clipstack.app
 Scripts/build-app.sh --install  # e instala em /Applications
-Scripts/notarize.sh             # notariza e gera um zip para distribuir
+Scripts/notarize.sh             # notariza e gera um zip e uma imagem de disco para distribuir
 ```
 
 O script assina com o certificado **Developer ID Application** do Keychain, o mesmo do

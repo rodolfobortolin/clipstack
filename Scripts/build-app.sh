@@ -40,14 +40,26 @@ if [ ! -f Resources/AppIcon.icns ] || [ Resources/AppIcon.png -nt Resources/AppI
   iconutil -c icns "$ICONSET" -o Resources/AppIcon.icns
 fi
 
-echo "==> swift build ($CONFIG)"
-swift build -c "$CONFIG"
-BIN_DIR=$(swift build -c "$CONFIG" --show-bin-path)
-
 APP="build/$APP_NAME.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN_DIR/$APP_NAME" "$APP/Contents/MacOS/"
+
+# A release build is universal, so it runs on Intel Macs as well as on Apple
+# silicon: one build per architecture, joined by lipo. Both land in the same
+# folder, so each is copied out before the next. A debug build is native only.
+if [ "$CONFIG" = release ]; then
+  SLICES=$(mktemp -d)
+  for ARCH in arm64 x86_64; do
+    echo "==> swift build ($CONFIG, $ARCH)"
+    swift build -c "$CONFIG" --triple "$ARCH-apple-macosx14.0"
+    cp "$(swift build -c "$CONFIG" --triple "$ARCH-apple-macosx14.0" --show-bin-path)/$APP_NAME" "$SLICES/$ARCH"
+  done
+  lipo -create "$SLICES/arm64" "$SLICES/x86_64" -output "$APP/Contents/MacOS/$APP_NAME"
+else
+  echo "==> swift build ($CONFIG)"
+  swift build -c "$CONFIG"
+  cp "$(swift build -c "$CONFIG" --show-bin-path)/$APP_NAME" "$APP/Contents/MacOS/"
+fi
 cp Resources/Info.plist "$APP/Contents/"
 
 # The icon. Resources/AppIcon.icon is an Icon Composer icon: actool turns it
